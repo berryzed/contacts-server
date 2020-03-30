@@ -1,6 +1,8 @@
-package com.daoutech.contacts.server;
+package com.daoutech.contacts.server.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.validator.constraints.ScriptAssert;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -8,6 +10,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
+@ScriptAssert(lang = "javascript",
+		script = "(_.email != null && _.email.length() > 0) || (_.tel != null && _.tel.length() > 0)",
+		alias = "_", message = "이메일 혹은 전화 번호 둘 중 하나는 필수 입니다")
 @Getter
 @Setter
 @Builder
@@ -15,7 +20,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "contacts", indexes = {
-		@Index(columnList = "name"), @Index(columnList = "tel"), @Index(columnList = "email")
+		@Index(columnList = "name, user_id"), @Index(columnList = "tel, user_id"), @Index(columnList = "email, user_id")
 })
 public class Contact implements Serializable {
 
@@ -37,7 +42,15 @@ public class Contact implements Serializable {
 	@Size(max = 100, message = "메모는 100자리 이하로 입력해 주세요.")
 	private String memo;
 
-	@ManyToOne(cascade = CascadeType.DETACH)
+	@JsonIgnore
+	@ManyToOne(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
+
+	public void updateFields(Contact contact) {
+		this.name = contact.getName();
+		this.tel = contact.getTel();
+		this.email = contact.getEmail();
+		this.memo = contact.getMemo();
+	}
 }

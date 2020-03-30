@@ -1,5 +1,8 @@
 package com.daoutech.contacts.server;
 
+import com.daoutech.contacts.server.domain.Contact;
+import com.daoutech.contacts.server.domain.User;
+import com.daoutech.contacts.server.repository.UserRepository;
 import com.google.common.base.Stopwatch;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

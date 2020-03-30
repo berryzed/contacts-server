@@ -1,6 +1,9 @@
 plugins {
     id 'org.springframework.boot' version '2.2.5.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
+    id 'io.franzbecker.gradle-lombok' version '3.3.0'
+    id 'idea'
     id 'java'
 }
 
@@ -37,4 +40,42 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+// QueryDSL 추가
+def generatedJavaSrcDir = 'src/main/generated'
+querydsl {
+    library = 'com.querydsl:querydsl-apt'
+    jpa = true
+    querydslSourcesDir = generatedJavaSrcDir
+}
+
+sourceSets {
+    generated {
+        java {
+            srcDirs = [generatedJavaSrcDir]
+        }
+    }
+
+    main {
+        java {
+            srcDirs = ['src/main/java', generatedJavaSrcDir]
+        }
+    }
+}
+
+idea {
+    module {
+        sourceDirs += file('generated/')
+        generatedSourceDirs += file('generated/')
+    }
+}
+
+// gradle 5에서는 아래 내용 추가
+compileQuerydsl {
+    options.annotationProcessorPath = configurations.querydsl
+}
+
+configurations {
+    querydsl.extendsFrom compileClasspath
 }
