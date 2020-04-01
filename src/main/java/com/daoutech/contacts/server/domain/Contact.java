@@ -43,8 +43,8 @@ public class Contact implements Serializable {
 	private String memo;
 
 	@JsonIgnore
-	@ManyToOne(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
+	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH}, fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false, updatable = false)
 	private User user;
 
 	public void updateFields(Contact contact) {

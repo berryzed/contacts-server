@@ -6,7 +6,7 @@ import com.querydsl.core.types.dsl.StringPath;
 import lombok.Getter;
 import lombok.Setter;
 
-import static com.daoutech.contacts.server.QContact.contact;
+import static com.daoutech.contacts.server.domain.QContact.contact;
 
 @Getter
 @Setter

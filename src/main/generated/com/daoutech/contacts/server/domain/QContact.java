@@ -1,8 +1,7 @@
-package com.daoutech.contacts.server;
+package com.daoutech.contacts.server.domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import com.daoutech.contacts.server.domain.Contact;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
@@ -17,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.EntitySerializer")
 public class QContact extends EntityPathBase<Contact> {
 
-    private static final long serialVersionUID = -1818451096L;
+    private static final long serialVersionUID = 913707118L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 

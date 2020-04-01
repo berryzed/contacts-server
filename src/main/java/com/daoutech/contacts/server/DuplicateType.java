@@ -2,7 +2,7 @@ package com.daoutech.contacts.server;
 
 import com.querydsl.core.types.dsl.StringPath;
 
-import static com.daoutech.contacts.server.QContact.contact;
+import static com.daoutech.contacts.server.domain.QContact.contact;
 
 public enum DuplicateType {
 	NAME, TEL, EMAIL;

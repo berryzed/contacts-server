@@ -1,9 +1,9 @@
 package com.daoutech.contacts.server.service;
 
 import com.daoutech.contacts.server.ContactFilter;
-import com.daoutech.contacts.server.DataNotFoundException;
 import com.daoutech.contacts.server.DuplicateType;
 import com.daoutech.contacts.server.domain.Contact;
+import com.daoutech.contacts.server.exception.DataNotFoundException;
 import com.daoutech.contacts.server.repository.ContactRepository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.daoutech.contacts.server.QContact.contact;
+import static com.daoutech.contacts.server.domain.QContact.contact;
 
 @Slf4j
 @Service
@@ -49,9 +49,10 @@ public class ContactService extends QuerydslRepositorySupport {
 
 	public Page<Contact> findDuplicates(Integer userId, DuplicateType type, Pageable pageable) {
 		StringPath key = DuplicateType.getKey(type);
+		String keyName = key.getMetadata().getName();
 
-		Sort.Order order = pageable.getSort().getOrderFor(key.toString());
-		if (order == null) order = new Sort.Order(Sort.Direction.ASC, key.toString());
+		Sort.Order order = pageable.getSort().getOrderFor(keyName);
+		if (order == null) order = new Sort.Order(Sort.Direction.ASC, keyName);
 
 		// 서브쿼리보다 나눠서 하는게 빠름
 		JPQLQuery<String> findDuplicates = from(contact)
