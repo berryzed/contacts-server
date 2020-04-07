@@ -1,7 +1,7 @@
 package com.daoutech.contacts.server;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.querydsl.core.types.Predicate;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.StringPath;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,34 +12,35 @@ import static com.daoutech.contacts.server.domain.QContact.contact;
 @Setter
 public class ContactFilter {
 
+	private Integer fCGroupId;
 	private SearchType fSearchType;
 	private String fKeyword = "";
 
-	public String generateRedisKey(String userId) {
-		return userId + ":" + fSearchType + ":" + fKeyword;
-	}
-
 	@JsonIgnore
-	public Predicate getPredicate() {
-		if (this.fSearchType == null) return null;
-		StringPath field = contact.name;
+	public BooleanBuilder getPredicate() {
+		BooleanBuilder builder = new BooleanBuilder();
+		if (this.fSearchType == null || this.fKeyword.isEmpty()) {
+			return null;
+		}
+
+		StringPath searchField = contact.name;
 
 		switch (this.fSearchType) {
 			case TEL:
-				field = contact.tel;
+				searchField = contact.tel;
 				break;
 			case EMAIL:
-				field = contact.email;
+				searchField = contact.email;
 				break;
-//			case GROUP:
-//				field = contact.tel;
-//				break;
+			case MEMO:
+				searchField = contact.memo;
+				break;
 		}
 
-		return field.containsIgnoreCase(this.fKeyword);
+		return builder.and(searchField.containsIgnoreCase(this.fKeyword));
 	}
-}
 
-enum SearchType {
-	NAME, TEL, EMAIL, GROUP
+	enum SearchType {
+		NAME, TEL, EMAIL, MEMO
+	}
 }

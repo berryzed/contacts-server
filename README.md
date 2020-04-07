@@ -8,13 +8,13 @@
 
 - [ ] 사용자 추가
 
-- [ ] 그룹 추가
+- [x] 그룹 추가
 
 - [ ] Spring security 적용
 
-- [ ] 커스텀 에러 적용
+- [x] 커스텀 에러 적용
 
-- [ ] Validation 처리
+- [x] Validation 처리
 
 - [ ] JWT 인증 적용
 

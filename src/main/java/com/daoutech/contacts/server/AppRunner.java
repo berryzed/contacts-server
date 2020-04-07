@@ -1,7 +1,9 @@
 package com.daoutech.contacts.server;
 
+import com.daoutech.contacts.server.domain.CGroup;
 import com.daoutech.contacts.server.domain.Contact;
 import com.daoutech.contacts.server.domain.User;
+import com.daoutech.contacts.server.repository.CGroupRepository;
 import com.daoutech.contacts.server.repository.UserRepository;
 import com.google.common.base.Stopwatch;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +29,13 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class AppRunner implements ApplicationRunner {
 
-	private static final String QUERY = "INSERT INTO contacts (`name`, `tel`, `email`, `user_id`) VALUES (?, ?, ?, ?)";
+	private static final String QUERY = "INSERT INTO contacts (`name`, `tel`, `email`, `cgroup_id`) VALUES (?, ?, ?, ?)";
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private CGroupRepository cGroupRepository;
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -57,38 +62,42 @@ public class AppRunner implements ApplicationRunner {
 	@SuppressWarnings("UnstableApiUsage")
 	@Transactional
 	protected void initData() {
-		User user = new User();
-		userRepository.save(user);
-
 		List<Long> elapsedTimes = new ArrayList<>();
 		List<Contact> dummy = new ArrayList<>();
 		Stopwatch stopwatch = Stopwatch.createStarted();
 
-		for (int j = 0; j < 200; j++) {
+		for (int j = 0; j < 100; j++) {
+			User user = new User();
+			userRepository.save(user);
+
+			CGroup cGroup = new CGroup();
+			cGroup.setUser(user);
+			cGroupRepository.save(cGroup);
+
 			stopwatch.reset().start();
 			log.info("count: {}", j);
 			// 100_000_000
-			// 500_000 * 200
-			for (int i = 0; i < 50_000; i++) {
-				int num = ThreadLocalRandom.current().nextInt(10000);
-				Contact c;
-				if (num % 2 == 0) {
-					c = Contact.builder().name("NAME" + num).email("TEST" + num + "@email.net").user(user).build();
+			// 100_000 * 100
+			for (int i = 0; i < 100_000; i++) {
+
+				int rand = randomNo();
+				Contact.ContactBuilder cb = Contact.builder().name("최경림" + rand);
+				if (i % 2 == 0) {
+					cb = cb.email("TEST" + rand + "@email.net");
 				} else {
-					c = Contact.builder().name("NAME" + num).tel(String.format("%s%04d%04d", firstNo(), randomNo(), randomNo())).user(user).build();
+					cb = cb.tel(String.format("%s%04d%04d", firstNo(), randomNo(), randomNo()));
 				}
-				dummy.add(c);
+				dummy.add(cb.cGroup(cGroup).build());
 			}
 
 			batchInsert(dummy);
 			dummy.clear();
 			stopwatch.stop();
-			elapsedTimes.add(stopwatch.elapsed(TimeUnit.MILLISECONDS));
+			elapsedTimes.add(stopwatch.elapsed(TimeUnit.MINUTES));
 		}
 
 
-		log.info("total {}ms", elapsedTimes.stream().mapToLong(t -> t).sum());
-		log.info("avg {}ms", elapsedTimes.stream().mapToLong(t -> t).average().orElse(0.0));
+		log.info("total {}m", elapsedTimes.stream().mapToLong(t -> t).sum());
 	}
 
 	/**
@@ -106,7 +115,7 @@ public class AppRunner implements ApplicationRunner {
 						ps.setString(1, c.getName());
 						ps.setString(2, c.getTel());
 						ps.setString(3, c.getEmail());
-						ps.setInt(4, c.getUser().getId());
+						ps.setInt(4, c.getCGroup().getId());
 					}
 
 					@Override

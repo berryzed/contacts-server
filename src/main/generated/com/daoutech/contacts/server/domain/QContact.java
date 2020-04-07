@@ -22,6 +22,8 @@ public class QContact extends EntityPathBase<Contact> {
 
     public static final QContact contact = new QContact("contact");
 
+    public final QCGroup cGroup;
+
     public final StringPath email = createString("email");
 
     public final NumberPath<Integer> id = createNumber("id", Integer.class);
@@ -31,8 +33,6 @@ public class QContact extends EntityPathBase<Contact> {
     public final StringPath name = createString("name");
 
     public final StringPath tel = createString("tel");
-
-    public final QUser user;
 
     public QContact(String variable) {
         this(Contact.class, forVariable(variable), INITS);
@@ -52,7 +52,7 @@ public class QContact extends EntityPathBase<Contact> {
 
     public QContact(Class<? extends Contact> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.user = inits.isInitialized("user") ? new QUser(forProperty("user")) : null;
+        this.cGroup = inits.isInitialized("cGroup") ? new QCGroup(forProperty("cGroup"), inits.get("cGroup")) : null;
     }
 
 }
