@@ -43,9 +43,11 @@ public class CGroup implements Serializable {
 
 	@JsonIgnore
 //	@JsonBackReference
-	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH}, fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
+	@ManyToOne
+	@JoinColumn(name = "user_id", nullable = false, updatable = false)
 	private User user;
+
+	private boolean defalutGroup;
 
 	public void update(CGroup cGroup) {
 		this.name = cGroup.getName();

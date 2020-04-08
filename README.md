@@ -18,6 +18,4 @@
 
 - [x] JWT 인증 적용
 
-- [ ] Pagination Seek 메소드 만들기
-
 - [ ] 성능 측정

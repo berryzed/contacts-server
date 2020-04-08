@@ -22,6 +22,8 @@ public class QCGroup extends EntityPathBase<CGroup> {
 
     public static final QCGroup cGroup = new QCGroup("cGroup");
 
+    public final BooleanPath defalutGroup = createBoolean("defalutGroup");
+
     public final NumberPath<Integer> id = createNumber("id", Integer.class);
 
     public final StringPath name = createString("name");

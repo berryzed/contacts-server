@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,65 +24,61 @@ public class ExceptionAdvice {
 //		return new ErrorResponse(e, "알 수 없는 에러가 발생하였습니다.");
 //	}
 
-	@ResponseStatus(HttpStatus.UNAUTHORIZED)
-	@ExceptionHandler(BearerTokenException.class)
-	protected ErrorResponse handleBearerTokenException(BearerTokenException e) {
-		return new ErrorResponse(e);
-	}
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(BearerTokenException.class)
+    protected ErrorResponse handleBearerTokenException(BearerTokenException e) {
+        return new ErrorResponse(e);
+    }
 
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(HttpMessageNotReadableException.class)
-	protected ErrorResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-		return new ErrorResponse(e, "잘못된 파라미터 요청입니다.");
-	}
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    protected ErrorResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        return new ErrorResponse(e, "잘못된 파라미터 요청입니다.");
+    }
 
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(BadRequestException.class)
-	protected ErrorResponse handleBadRequestException(BadRequestException e) {
-		return new ErrorResponse(e, e.getErrors());
-	}
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BadRequestException.class)
+    protected ErrorResponse handleBadRequestException(BadRequestException e) {
+        return new ErrorResponse(e, e.getErrors());
+    }
 
-	@ResponseStatus(HttpStatus.NOT_FOUND)
-	@ExceptionHandler(DataNotFoundException.class)
-	protected ErrorResponse handleDataNotFoundException(DataNotFoundException e) {
-		return new ErrorResponse(e);
-	}
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(DataNotFoundException.class)
+    protected ErrorResponse handleDataNotFoundException(DataNotFoundException e) {
+        return new ErrorResponse(e);
+    }
 
-	@ResponseStatus(HttpStatus.FORBIDDEN)
-	@ExceptionHandler(AccessDeniedException.class)
-	protected ErrorResponse handleAccessDeniedException(AccessDeniedException e) {
-		return new ErrorResponse(e);
-	}
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(AccessDeniedException.class)
+    protected ErrorResponse handleAccessDeniedException(AccessDeniedException e) {
+        return new ErrorResponse(e);
+    }
 
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	protected ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-		List<ErrorResponse.Field> errors = new ArrayList<>();
-		for (ObjectError oe : e.getBindingResult().getGlobalErrors()) {
-			errors.add(new ErrorResponse.Field(oe.getObjectName(), oe.getDefaultMessage()));
-		}
-		for (FieldError fe : e.getBindingResult().getFieldErrors()) {
-			errors.add(new ErrorResponse.Field(fe.getField(), fe.getDefaultMessage()));
-		}
-		return ErrorResponse.builder()
-				.error("MethodArgumentNotValidException")
-				.description("잘못된 타입 요청입니다.")
-				.errors(errors)
-				.build();
-	}
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    protected ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        List<ErrorResponse.Field> errors = new ArrayList<>();
+        for (ObjectError oe : e.getBindingResult().getGlobalErrors())
+            errors.add(new ErrorResponse.Field(oe.getObjectName(), oe.getDefaultMessage()));
+        for (FieldError fe : e.getBindingResult().getFieldErrors())
+            errors.add(new ErrorResponse.Field(fe.getField(), fe.getDefaultMessage()));
+        return ErrorResponse.builder()
+                .error("MethodArgumentNotValidException")
+                .description("잘못된 타입 요청입니다.")
+                .errors(errors)
+                .build();
+    }
 
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(BindException.class)
-	protected ErrorResponse handleBindException(BindException e) {
-		List<ErrorResponse.Field> errors = new ArrayList<>();
-		for (FieldError fe : e.getFieldErrors()) {
-			String message = String.format("[%s] 잘못된 타입의 값입니다.", fe.getRejectedValue());
-			errors.add(new ErrorResponse.Field(fe, message));
-		}
-		return ErrorResponse.builder()
-				.error("BindException")
-				.description("잘못된 타입 요청입니다.")
-				.errors(errors)
-				.build();
-	}
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BindException.class)
+    protected ErrorResponse handleBindException(BindException e) {
+        List<ErrorResponse.Field> errors = new ArrayList<>();
+        for (FieldError fe : e.getFieldErrors())
+            errors.add(new ErrorResponse.Field(fe, String.format("[%s] 잘못된 타입의 값입니다.", fe.getRejectedValue())));
+        return ErrorResponse.builder()
+                .error("BindException")
+                .description("잘못된 타입 요청입니다.")
+                .errors(errors)
+                .build();
+    }
 }

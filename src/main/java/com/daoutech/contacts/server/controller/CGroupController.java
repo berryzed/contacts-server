@@ -1,6 +1,8 @@
 package com.daoutech.contacts.server.controller;
 
+import com.daoutech.contacts.server.RestPageResponse;
 import com.daoutech.contacts.server.domain.CGroup;
+import com.daoutech.contacts.server.domain.Contact;
 import com.daoutech.contacts.server.domain.User;
 import com.daoutech.contacts.server.exception.BadRequestException;
 import com.daoutech.contacts.server.exception.ErrorResponse;
@@ -28,8 +30,9 @@ public class CGroupController {
 	private CGroupService cGroupService;
 
 	@GetMapping("/v1.0/cgroups")
-	public Page<CGroup> getAll(@PageableDefault(sort = "name") Pageable pageable, @AuthenticationPrincipal User currentUser) {
-		return cGroupService.findAll(currentUser.getId(), pageable);
+	public RestPageResponse<CGroup> getAll(@PageableDefault(sort = "name") Pageable pageable, @AuthenticationPrincipal User currentUser) {
+		Page<CGroup> cGroupPage = cGroupService.findAll(currentUser.getId(), pageable);
+		return new RestPageResponse<>(cGroupPage);
 	}
 
 	@GetMapping("/v1.0/cgroups/{id}")

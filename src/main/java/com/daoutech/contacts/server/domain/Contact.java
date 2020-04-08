@@ -28,23 +28,23 @@ import java.io.Serializable;
 public class Contact implements Serializable {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue
 	private Integer id;
 
-	@Size(min = 1, max = 20, message = "이름은 20자 이하로 입력해 주세요.")
+	@Size(min = 2, max = 20, message = "이름은 {min}자 이상 {max}자 이하로 입력해 주세요.")
 	private String name;
 
-	@Size(max = 17, message = "전화 번호는 17자 이하로 입력해 주세요.")
+	@Size(max = 17, message = "전화 번호는 {max}자 이하로 입력해 주세요.")
 	private String tel;
 
 	@Email(message = "이메일 형식으로 입력해 주세요.")
-	@Size(max = 50, message = "이메일 주소는 50자 이하로 입력해 주세요.")
+	@Size(max = 50, message = "이메일 주소는 {max}자 이하로 입력해 주세요.")
 	private String email;
 
-	@Size(max = 125, message = "메모는 125자 이하로 입력해 주세요.")
+	@Size(max = 125, message = "메모는 {max}자 이하로 입력해 주세요.")
 	private String memo;
 
-	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
+	@ManyToOne(cascade = {CascadeType.DETACH})
 	@JoinColumn(name = "cgroup_id", nullable = false)
 	private CGroup cGroup;
 
@@ -55,7 +55,7 @@ public class Contact implements Serializable {
 		this.memo = contact.getMemo();
 
 		if (contact.getCGroup() != null) {
-			this.cGroup = contact.getCGroup();
+			this.cGroup.setId(contact.getCGroup().getId());
 		}
 	}
 }
