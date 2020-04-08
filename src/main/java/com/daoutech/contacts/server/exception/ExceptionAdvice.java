@@ -5,11 +5,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,8 +59,11 @@ public class ExceptionAdvice {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	protected ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
 		List<ErrorResponse.Field> errors = new ArrayList<>();
+		for (ObjectError oe : e.getBindingResult().getGlobalErrors()) {
+			errors.add(new ErrorResponse.Field(oe.getObjectName(), oe.getDefaultMessage()));
+		}
 		for (FieldError fe : e.getBindingResult().getFieldErrors()) {
-			errors.add(new ErrorResponse.Field(fe));
+			errors.add(new ErrorResponse.Field(fe.getField(), fe.getDefaultMessage()));
 		}
 		return ErrorResponse.builder()
 				.error("MethodArgumentNotValidException")

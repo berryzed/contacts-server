@@ -1,4 +1,4 @@
-package com.daoutech.contacts.server;
+package com.daoutech.contacts.server.security;
 
 import com.daoutech.contacts.server.exception.BearerTokenException;
 import io.jsonwebtoken.Claims;

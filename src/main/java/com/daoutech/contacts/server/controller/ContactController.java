@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -28,43 +29,44 @@ public class ContactController {
 	private ContactService contactService;
 
 	@GetMapping("/v1.0/contacts")
-	public Page<Contact> getAll(ContactFilter filter, @PageableDefault(sort = "name", size = 100) Pageable pageable) {
-		return contactService.findAll(1, filter, pageable);
+	public Page<Contact> getAll(ContactFilter filter, @PageableDefault(sort = "name", size = 100) Pageable pageable,
+								@AuthenticationPrincipal User currentUser) {
+		return contactService.findAll(currentUser.getId(), filter, pageable);
 	}
 
 	@GetMapping("/v1.0/duplicates")
 	public Page<Contact> getDuplicates(@RequestParam(name = "type", required = false) DuplicateType type,
 									   @RequestParam(name = "cGroupId", required = false) Integer cGroupId,
-									   @PageableDefault(size = 100) Pageable pageable) {
+									   @PageableDefault(size = 100) Pageable pageable, @AuthenticationPrincipal User currentUser) {
 		if (type == null) type = DuplicateType.TEL;
-		return contactService.findDuplicates(1, cGroupId, type, pageable);
+		return contactService.findDuplicates(currentUser.getId(), cGroupId, type, pageable);
 	}
 
 	@GetMapping("/v1.0/contacts/{id}")
-	public Contact getOne(@PathVariable("id") Integer id) throws JsonProcessingException {
-		return contactService.findById(id, 1);
+	public Contact getOne(@PathVariable("id") Integer id, @AuthenticationPrincipal User currentUser) {
+		return contactService.findById(id, currentUser.getId());
 	}
 
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping("/v1.0/contacts")
-	public Contact save(@Valid @RequestBody Contact contact) {
+	public Contact save(@Valid @RequestBody Contact contact, @AuthenticationPrincipal User currentUser) {
 		if (contact.getCGroup() == null) {
 			throw new BadRequestException(new ErrorResponse.Field("cGroup", "그룹 정보가 없습니다."));
 		}
 
-		contact.getCGroup().setUser(new User(1));
+		contact.getCGroup().setUser(currentUser);
 		return contactService.save(contact);
 	}
 
 	@PutMapping("/v1.0/contacts/{id}")
-	public Contact update(@PathVariable("id") Integer id, @Valid @RequestBody Contact contact) {
-		return contactService.updateById(id, 1, contact);
+	public Contact update(@PathVariable("id") Integer id, @Valid @RequestBody Contact contact,
+						  @AuthenticationPrincipal User currentUser) {
+		return contactService.updateById(id, currentUser.getId(), contact);
 	}
 
-	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@DeleteMapping("/v1.0/contacts")
-	public Map<String, Long> delete(@RequestBody Integer[] ids) {
-		long count = contactService.deleteAllByIds(ids, 1);
+	public Map<String, Long> delete(@RequestBody Integer[] ids, @AuthenticationPrincipal User currentUser) {
+		long count = contactService.deleteAllByIds(ids, currentUser.getId());
 		return Collections.singletonMap("count", count);
 	}
 }

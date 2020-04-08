@@ -106,7 +106,7 @@ public class ContactService extends QuerydslRepositorySupport {
 		builder.and(contact.id.eq(id));
 //		builder.and(contact.cGroup.user.id.eq(userId));
 
-		return Optional.of(from(contact).where(builder).fetchFirst()).orElseThrow(DataNotFoundException::new);
+		return Optional.ofNullable(from(contact).where(builder).fetchFirst()).orElseThrow(DataNotFoundException::new);
 	}
 
 	public Contact save(Contact contact) {

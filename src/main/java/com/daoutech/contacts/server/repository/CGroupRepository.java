@@ -11,8 +11,6 @@ import java.util.Optional;
 @Repository
 public interface CGroupRepository extends JpaRepository<CGroup, Integer> {
 
-	Page<CGroup> findAllByUserId(Integer userId, Pageable pageable);
-
 	Optional<CGroup> findByIdAndUser_Id(Integer id, Integer userId);
 
 	long deleteByIdAndUser_Id(Integer id, Integer userId);

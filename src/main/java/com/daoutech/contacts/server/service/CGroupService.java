@@ -31,7 +31,7 @@ public class CGroupService extends QuerydslRepositorySupport {
 		super(CGroup.class);
 	}
 
-	public Page<CGroup> findAllByUserId(Integer userId, Pageable pageable) {
+	public Page<CGroup> findAll(Integer userId, Pageable pageable) {
 		BooleanBuilder builder = new BooleanBuilder();
 		builder.and(cGroup.user.id.eq(userId));
 		// TODO 그룹 별 연락처 개수 가져오기
@@ -56,7 +56,12 @@ public class CGroupService extends QuerydslRepositorySupport {
 
 	@Transactional
 	public long deleteById(Integer id, Integer userId) {
-		delete(contact).where(contact.cGroup.id.eq(id).and(contact.cGroup.user.id.eq(userId))).execute();
+		findById(id, userId);
+		BooleanBuilder builder = new BooleanBuilder();
+		builder.and(contact.cGroup.id.eq(id));
+//		builder.and(contact.cGroup.user.id.eq(userId));
+		delete(contact).where(builder).execute();
+
 		return cGroupRepository.deleteByIdAndUser_Id(id, userId);
 	}
 }

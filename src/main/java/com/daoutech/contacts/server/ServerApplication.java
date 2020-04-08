@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @EnableCaching
 @EnableTransactionManagement
-@EnableJpaRepositories
+@EnableJpaRepositories(basePackages = "com.daoutech.contacts.server.repository")
 @SpringBootApplication
 public class ServerApplication {
 
